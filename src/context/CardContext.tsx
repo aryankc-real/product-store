@@ -1,16 +1,7 @@
-import type { CartItem, Product } from "@/types/product";
-import { createContext, useMemo, useState, type ReactNode } from "react";
+import type { CartItem, Product } from "../types/product";
+import { useMemo, useState, type ReactNode } from "react";
+import { CartContext, type CartContextValue } from "./CardContext";
 
-interface CardContextValue {
-  items: CartItem[];
-  addToCart: (product: Product) => void;
-  removeFromCart: (productId: number) => void;
-  updateQuantity: (productId: number, quantity: number) => void;
-  clearCart: () => void;
-  totalItems: number;
-  totalPrice: number;
-}
-const CardContext = createContext<CardContextValue | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   function addToCart(product: Product) {
@@ -34,11 +25,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeFromCart(productId);
       return;
     }
-    setItems((prev) => {
-      return prev.map((item) =>
+    setItems((prev) =>
+      prev.map((item) =>
         item.product.id === productId ? { ...item, quantity } : item,
-      );
-    });
+      ),
+    );
   }
   function clearCart() {
     setItems([]);
@@ -52,4 +43,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
       items.reduce((sum, item) => sum + item.quantity * item.product.price, 0),
     [items],
   );
+
+  const value: CartContextValue = {
+    items,
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
+    totalItems,
+    totalPrice,
+  };
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

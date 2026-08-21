@@ -5,7 +5,7 @@ import { ProductContext, type ProductContextValue } from "./ProductContext";
 
 export function ProductProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCatergories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,7 +26,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
         ]);
         if (!cancelled) {
           setProducts(productData);
-          setCatergories(categoriesData);
+          setCategories(categoriesData);
         }
       } catch (err) {
         if (!cancelled) {
