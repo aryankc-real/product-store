@@ -1,4 +1,4 @@
-import FilterBar from "../components/FilterBar";
+import FilterBar from "@/components/FilterBar";
 import ProductCard from "@/components/ProductCard";
 import { useProduct } from "@/context/useProduct";
 
