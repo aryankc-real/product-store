@@ -1,32 +1,8 @@
 import { fetchCategories, fetchProduct } from "@/api/product";
 import type { Product } from "@/types/product";
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { ProductContext, type ProductContextValue } from "./ProductContext";
 
-interface ProductContextValue {
-  products: Product[];
-  categories: string[];
-  loading: boolean;
-  error: string | null;
-  //filtering
-  searchTerm: string;
-  setSearchTerm: (term: string) => void;
-  selectCategory: string;
-  setSelectCategory: (category: string) => void;
-  sortOrder: "none" | "price-asc" | "price-desc";
-  setSortOrder: (order: "none" | "price-asc" | "price-desc") => void;
-  //deleved data
-  filteredProduct: Product[];
-}
-const ProductContext = createContext<ProductContextValue | undefined>(
-  undefined,
-);
 export function ProductProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCatergories] = useState<string[]>([]);
@@ -34,7 +10,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectCategory, setSelectCategory] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortOrder, setSortOrder] = useState<
     "none" | "price-asc" | "price-desc"
   >("none");
@@ -68,8 +44,8 @@ export function ProductProvider({ children }: { children: ReactNode }) {
 
   const filteredProduct = useMemo(() => {
     let result = [...products];
-    if (selectCategory !== "") {
-      result = result.filter((p) => p.category === selectCategory);
+    if (selectedCategory !== "all") {
+      result = result.filter((p) => p.category === selectedCategory);
     }
     if (searchTerm.trim() !== "") {
       const term = searchTerm.toLowerCase();
@@ -81,7 +57,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
       result.sort((a, b) => b.price - a.price);
     }
     return result;
-  }, [products, selectCategory, searchTerm, sortOrder]);
+  }, [products, selectedCategory, searchTerm, sortOrder]);
 
   const value: ProductContextValue = {
     products,
@@ -90,8 +66,8 @@ export function ProductProvider({ children }: { children: ReactNode }) {
     error,
     searchTerm,
     setSearchTerm,
-    selectCategory,
-    setSelectCategory,
+    selectedCategory,
+    setSelectedCategory,
     sortOrder,
     setSortOrder,
     filteredProduct,
@@ -100,12 +76,4 @@ export function ProductProvider({ children }: { children: ReactNode }) {
   return (
     <ProductContext.Provider value={value}>{children}</ProductContext.Provider>
   );
-}
-
-export function useProduct() {
-  const ctx = useContext(ProductContext);
-  if (!ctx) {
-    throw new Error("useProduct must be used within ProductProvider");
-  }
-  return ctx;
 }
